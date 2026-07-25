@@ -9,7 +9,6 @@
 
 A **production-grade, enterprise-ready** evaluation framework for Large Language Models (LLMs), Retrieval-Augmented Generation (RAG) systems, Chatbots, AI Agents, and Tool-Calling systems. Built with Clean Architecture, Domain-Driven Design, and SOLID principles.
 
----
 
 ## ✨ Key Features
 
@@ -23,8 +22,6 @@ A **production-grade, enterprise-ready** evaluation framework for Large Language
 | **Visualization** | 9 publication-quality chart types (Radar, Box, Violin, Histogram, Heatmap, Correlation, KDE, Failure Breakdown, Metric Comparison) |
 | **Statistics** | Mean, Median, Mode, Variance, Std Dev, Percentiles (P10/P25/P75/P90), Skewness, Kurtosis, 95% Confidence Intervals |
 | **Infrastructure** | Docker, GitHub Actions CI/CD, Poetry, Pydantic v2, Rich CLI |
-
----
 
 ## 🏛️ Architecture
 
@@ -133,7 +130,6 @@ llm-evaluation-framework/
     └── test_visualization.py
 ```
 
----
 
 ## 🚀 Quick Start
 
@@ -171,7 +167,6 @@ poetry run llm-eval run \
   --run-id my_experiment_v1
 ```
 
----
 
 ## 🛠️ CLI Command Reference
 
@@ -193,7 +188,6 @@ llm-eval --verbose          # Enable debug logging
 llm-eval --log-file run.log # Write logs to file
 ```
 
----
 
 ## ⚙️ Configuration
 
@@ -264,8 +258,6 @@ metrics:
   # ... see config.example.yaml for all options
 ```
 
----
-
 ## 📊 Metrics Reference
 
 ### Classical Metrics
@@ -300,8 +292,6 @@ metrics:
 |:---|:---|:---|:---|
 | **LLM Judge** | External LLM quality evaluation with bias mitigation | 0.0 – 1.0 | `llm_judge` |
 
----
-
 ## 📈 Visual Analytics & Reports
 
 The framework generates publication-quality outputs automatically:
@@ -331,7 +321,6 @@ The framework generates publication-quality outputs automatically:
 8. **Failure Breakdown** — Pass/fail counts by metric
 9. **Metric Comparison** — Grouped bars of mean/median/P25/P75
 
----
 
 ## 📋 Dataset Format
 
@@ -360,7 +349,6 @@ input_text,actual_output,expected_output,retrieved_contexts
 | `tools_called` | list[dict] | Optional | Tool invocation logs |
 | `metadata` | dict | Optional | Custom tags |
 
----
 
 ## 🐳 Docker Deployment
 
@@ -386,8 +374,6 @@ docker run --rm \
 - Volume mounts for data and reports
 - Environment variable configuration
 
----
-
 ## 🧪 Testing
 
 ### Run Full Test Suite
@@ -401,8 +387,6 @@ poetry run pytest tests/ -v --cov=src/llm_eval --cov-report=term-missing
 - **Mocked embedding service** (auto-use fixture — no model downloads)
 - **Deterministic pseudo-embeddings** for reproducible results
 - Tests cover: config, schemas, data loading, all 12 metrics, judge, pipeline, reporting, visualization, CLI, exceptions, embeddings, statistics
-
----
 
 ## 🔧 Developer Guide
 
@@ -453,8 +437,6 @@ poetry run mypy src/ --ignore-missing-imports
 poetry run bandit -r src/ -ll
 ```
 
----
-
 ## 🤝 Contribution Guide
 
 1. Fork the repository
@@ -470,8 +452,6 @@ poetry run bandit -r src/ -ll
 - All metrics must register via `@MetricRegistry.register()`
 - All new features must have tests
 - Follow SOLID, DRY, KISS principles
-
----
 
 ## ❓ FAQ & Troubleshooting
 
@@ -532,8 +512,11 @@ llm-eval report --input eval_reports/report_eval_run.json --output-dir new_repor
 llm-eval visualize --input eval_reports/report_eval_run.json --output-dir new_charts/
 ```
 
----
-
 ## 📄 License
 
 This project is available under the MIT License.
+
+## Author
+
+MANIKANTA SURYASAI
+AIML ENGINEER | DEVELOPER
