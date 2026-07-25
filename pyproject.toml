@@ -1,0 +1,390 @@
+[project]
+name = "llm-eval"
+version = "1.0.0"
+description = "Production-Grade LLM Evaluation Framework"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "LLM Evaluation Framework Team", email = "team@llm-eval.dev"}
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    # Core
+    "pydantic>=2.8,<3",
+    "pydantic-settings>=2.3,<3",
+    "typer[all]>=0.12,<1",
+    "pyyaml>=6.0,<7",
+    "python-dotenv>=1.0,<2",
+    
+    # ML/NLP
+    "torch>=2.3,<3",
+    "transformers>=4.40,<5",
+    "sentence-transformers>=3.0,<4",
+    "evaluate>=0.4,<1",
+    "nltk>=3.8,<4",
+    "rouge-score>=0.1,<1",
+    "bert-score>=0.3,<1",
+    "nltk>=3.8,<4",
+    "sacrebleu>=2.4,<3",
+    
+    # LLM Providers
+    "openai>=1.30,<2",
+    "anthropic>=0.39,<1",
+    "cohere>=5.0,<6",
+    "google-generativeai>=0.7,<1",
+    "tenacity>=8.2,<9",
+    
+    # Data Processing
+    "pandas>=2.2,<3",
+    "numpy>=1.26,<2",
+    "polars>=0.20,<1",
+    "pyarrow>=16,<17",
+    
+    # Visualization
+    "matplotlib>=3.8,<4",
+    "seaborn>=0.13,<1",
+    "plotly>=5.20,<6",
+    "kaleido>=0.2,<1",
+    
+    # Reporting
+    "jinja2>=3.1,<4",
+    "rich>=13.7,<14",
+    "pydantic[extra]>=2.8,<3",
+    
+    # Utilities
+    "loguru>=0.7,<1",
+    "tenacity>=8.2,<9",
+    "diskcache>=5.6,<6",
+    "joblib>=1.4,<2",
+    "tqdm>=4.66,<5",
+    "orjson>=3.9,<4",
+    "python-json-logger>=2.0,<3",
+    
+    # Async
+    "anyio>=4.4,<5",
+    "trio>=0.25,<1",
+    
+    # Validation
+    "email-validator>=2.1,<3",
+    "python-json-logger>=2.0,<3",
+    
+    # Serialization
+    "orjson>=3.9,<4",
+    "msgpack>=1.0,<2",
+    "pyarrow>=16,<17",
+    
+    # Monitoring
+    "prometheus-client>=0.19,<1",
+    "opentelemetry-api>=1.24,<2",
+    "opentelemetry-sdk>=1.24,<2",
+    
+    # Config
+    "pydantic-settings>=2.3,<3",
+    "python-dotenv>=1.0,<2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0,<9",
+    "pytest-cov>=4.1,<5",
+    "pytest-mock>=3.12,<4",
+    "pytest-asyncio>=0.23,<1",
+    "pytest-benchmark>=4.0,<5",
+    "pytest-xdist>=3.5,<4",
+    "pytest-html>=4.1,<5",
+    "pytest-cov>=4.1,<5",
+    "hypothesis>=6.92,<7",
+    "pytest-mock>=3.12,<4",
+    "coverage>=7.4,<8",
+    "ruff>=0.4,<1",
+    "black>=24.3,<25",
+    "mypy>=1.9,<2",
+    "pyright>=1.1,<2",
+    "bandit>=1.7,<2",
+    "pre-commit>=3.6,<4",
+    "mypy>=1.9,<2",
+    "types-requests>=2.31,<3",
+    "types-pyyaml>=6.0,<7",
+    "types-python-dateutil>=2.8,<3",
+    "types-setuptools>=70.0,<71",
+]
+docs = [
+    "mkdocs>=1.5,<2",
+    "mkdocs-material>=9.4,<10",
+    "mkdocstrings[python]>=0.25,<1",
+    "mkdocs-autorefs>=1.0,<2",
+]
+viz = [
+    "kaleido>=0.2,<1",
+    "plotly>=5.20,<6",
+    "matplotlib>=3.8,<4",
+    "seaborn>=0.13,<1",
+]
+benchmarks = [
+    "datasets>=2.18,<3",
+    "huggingface-hub>=0.22,<1",
+]
+devops = [
+    "docker>=7.0,<8",
+    "kubernetes>=29.0,<30",
+    "prometheus-client>=0.19,<1",
+]
+all = [
+    "llm-eval[viz,benchmarks,devops,dev,docs]",
+]
+
+[project.entry-points."console_scripts"]
+llm-eval = "llm_eval.cli.main:app"
+
+[project.urls]
+Homepage = "https://github.com/llm-eval/llm-eval"
+Repository = "https://github.com/llm-eval/llm-eval"
+Documentation = "https://llm-eval.readthedocs.io"
+Issues = "https://github.com/llm-eval/llm-eval/issues"
+
+[build-system]
+requires = ["setuptools>=70", "wheel>=0.42"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["llm_eval*"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--tb=short",
+    "-ra",
+    "--cov=llm_eval",
+    "--cov-report=term-missing",
+    "--cov-report=xml",
+    "--cov-fail-under=95",
+    "-n=auto",
+]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "e2e: End-to-end tests",
+    "benchmark: Benchmark tests",
+    "slow: Slow tests",
+    "requires_api: Tests requiring API keys",
+]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["src/llm_eval"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*_test.py",
+    "*/conftest.py",
+    "*/fixtures/*",
+]
+branch = true
+parallel = true
+concurrency = ["multiprocessing"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+indent-width = 4
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "T20", # flake8-print
+    "SIM", # flake8-simplify
+    "RUF", # ruff-specific
+    "PD",  # pandas-vet
+    "TRY", # tryceratops
+    "ARG", # flake8-unused-arguments
+    "PTH", # flake8-use-pathlib
+    "ERA", # eradicate
+    "TID", # flake8-tidy-imports
+    "PL",  # pylint
+    "Q",   # flake8-quotes
+    "RET", # flake8-return
+    "FLY", # flynt
+    "PERF", # perflint
+]
+ignore = [
+    "E501",  # line too long (handled by line-length)
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex (handled by complexity)
+    "T201",  # print statement (allowed in CLI)
+    "ARG001", # unused argument (allowed in callbacks)
+    "ARG002", # unused argument (allowed in callbacks)
+]
+per-file-ignores = [
+    { "tests/*" = ["S101", "S106", "T201"] },
+    { "src/llm_eval/cli/*" = ["T201"] },
+]
+exclude = [
+    ".git",
+    ".venv",
+    "build",
+    "dist",
+    "*.egg-info",
+    "htmlcov",
+    ".coverage",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    "node_modules",
+    "venv",
+    ".venv",
+]
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "lf"
+
+[tool.ruff.lint.isort]
+known-first-party = ["llm_eval"]
+known-third-party = [
+    "pydantic", "pydantic_settings", "typer", "pyyaml", "python_dotenv",
+    "torch", "transformers", "sentence_transformers", "evaluate", "nltk",
+    "rouge_score", "bert_score", "sacrebleu", "openai", "anthropic",
+    "cohere", "google_generativeai", "tenacity", "pandas", "numpy",
+    "polars", "pyarrow", "matplotlib", "seaborn", "plotly", "kaleido",
+    "jinja2", "rich", "loguru", "diskcache", "joblib", "tqdm", "orjson",
+    "python_json_logger", "anyio", "trio", "email_validator", "prometheus_client",
+    "opentelemetry_api", "opentelemetry_sdk", "pydantic_settings", "python_dotenv",
+    "mkdocs", "mkdocs_material", "mkdocstrings", "mkdocs_autorefs",
+    "datasets", "huggingface_hub", "docker", "kubernetes",
+]
+
+[tool.ruff.lint.flake8-bugbear]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-line-length = 100
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+strict = true
+enable_error_code = ["ignore-without-action"]
+disable_error_code = ["arg-type", "union-attr"]
+warn_unused_ignores = true
+show_error_codes = true
+pretty = true
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = ["tests.*", "test_*"]
+disallow_untyped_defs = false
+ignore_missing_imports = true
+
+[tool.pyright]
+include = ["src"]
+exclude = ["**/node_modules", "**/__pycache__", "build", "dist"]
+reportMissingTypeStubs = true
+reportUnknownMemberType = true
+reportUnknownParameterType = true
+reportUnknownVariableType = true
+reportUnknownArgumentType = true
+reportUnknownLambdaType = true
+reportGeneralTypeIssues = true
+typeCheckingMode = "strict"
+pythonVersion = "3.11"
+pythonPlatform = "linux"
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "venv"]
+skips = ["B101", "B601"]
+target_version = "3.11"
+
+[tool.pre-commit]
+default_stages = ["commit"]
+fail_fast = true
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+include = "\\\\.pyi?$"
+extend-exclude = """
+/(
+  # directories
+  \\.git
+  | \\.venv
+  | venv
+  | build
+  | dist
+  | htmlcov
+  | \\.mypy_cache
+  | \\.pytest_cache
+  | \\.ruff_cache
+  | node_modules
+)/
+"""
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+known_first_party = ["llm_eval"]
+src_paths = ["src"]
+
+[tool.semantic_release]
+version_variable = "src/llm_eval/__init__.py:__version__"
+tag_format = "v{version}"
+commit_parser = "conventional"
+changelog_file = "CHANGELOG.md"
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "1.0.0"
+tag_format = "v$version"

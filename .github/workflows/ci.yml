@@ -1,0 +1,72 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            .venv
+          key: poetry-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install Dependencies
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry install
+
+      - name: Lint (Ruff Check)
+        run: poetry run ruff check src/ tests/
+
+      - name: Format Check (Ruff Format)
+        run: poetry run ruff format --check src/ tests/
+
+      - name: Type Check (MyPy)
+        run: poetry run mypy src/ --ignore-missing-imports
+
+      - name: Security Scan (Bandit)
+        run: poetry run bandit -r src/ -ll -q
+
+      - name: Run Pytest Suite with Coverage
+        run: |
+          poetry run pytest tests/ -v \
+            --cov=src/llm_eval \
+            --cov-report=xml:coverage.xml \
+            --cov-report=term-missing
+
+      - name: Upload Coverage Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-py${{ matrix.python-version }}
+          path: coverage.xml
+
+      - name: Dry-Run CLI Smoke Tests
+        run: |
+          poetry run llm-eval version
+          poetry run llm-eval doctor
+          poetry run llm-eval metrics

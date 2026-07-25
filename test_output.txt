@@ -1,0 +1,7 @@
+Exit code: 2
+Output: Usage: main hello [OPTIONS]
+Try 'main hello --help' for help.
+┌─ Error ─────────────────────────────────────────────────────────────────────┐
+│ Got unexpected extra argument (Test)                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+

@@ -1,0 +1,5 @@
+Usage: llm-eval run [OPTIONS]
+Try 'llm-eval run --help' for help.
+┌─ Error ─────────────────────────────────────────────────────────────────────┐
+│ Got unexpected extra arguments (test.jsonl out test)                        │
+└─────────────────────────────────────────────────────────────────────────────┘

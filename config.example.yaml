@@ -1,0 +1,97 @@
+# =============================================================================
+# LLM Evaluation Framework — Configuration Example
+# =============================================================================
+# Copy this file to `config.yaml` and modify as needed.
+# All fields have sensible defaults and are optional.
+# Environment variables prefixed with LLM_EVAL_ override file values.
+# Nested keys use double underscores: LLM_EVAL_PIPELINE__MAX_WORKERS=8
+
+project_name: "My LLM Evaluation"
+log_level: INFO      # DEBUG | INFO | WARNING | ERROR
+# log_file: logs/eval.log   # Uncomment to enable file logging
+
+# ---------------------------------------------------------------------------
+# LLM Judge Provider Configuration
+# ---------------------------------------------------------------------------
+judge:
+  provider: mock       # openai | anthropic | mock
+  model_name: gpt-4o
+  # api_key: sk-...    # Or set LLM_EVAL_JUDGE__API_KEY env var
+  temperature: 0.0
+  max_tokens: 1024
+  request_timeout_seconds: 30.0
+  max_retries: 3
+
+# ---------------------------------------------------------------------------
+# Embedding Model
+# ---------------------------------------------------------------------------
+embeddings:
+  model_name: all-MiniLM-L6-v2
+  device: cpu          # cpu | cuda | mps
+  batch_size: 32
+  normalize_embeddings: true
+
+# ---------------------------------------------------------------------------
+# Pipeline Execution
+# ---------------------------------------------------------------------------
+pipeline:
+  max_workers: 4
+  fail_on_sample_error: false
+  cache_embeddings: true
+
+# ---------------------------------------------------------------------------
+# Reporting & Visualization
+# ---------------------------------------------------------------------------
+reporting:
+  output_dir: eval_reports
+  formats:
+    - json
+    - markdown
+    - html
+    - csv
+  generate_plots: true
+
+# ---------------------------------------------------------------------------
+# Metric Configuration
+# ---------------------------------------------------------------------------
+# Each metric can be enabled/disabled and have a pass/fail threshold.
+# Additional params are passed as **kwargs to the metric constructor.
+metrics:
+  bleu:
+    enabled: true
+    threshold: 0.3
+    params:
+      n_grams: 4
+  rouge_l:
+    enabled: true
+    threshold: 0.4
+  bert_score:
+    enabled: true
+    threshold: 0.7
+  embedding_similarity:
+    enabled: true
+    threshold: 0.75
+  faithfulness:
+    enabled: true
+    threshold: 0.8
+  context_relevancy:
+    enabled: true
+    threshold: 0.7
+  answer_relevancy:
+    enabled: true
+    threshold: 0.7
+  # context_precision:
+  #   enabled: true
+  #   threshold: 0.6
+  # context_recall:
+  #   enabled: true
+  #   threshold: 0.6
+  # groundedness:
+  #   enabled: true
+  #   threshold: 0.7
+  # hallucination_score:
+  #   enabled: true
+  #   threshold: 0.8
+  # llm_judge:
+  #   enabled: true
+  #   threshold: 0.7
