@@ -10,7 +10,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# lib/ (excluded for web directory)
 lib64/
 parts/
 sdist/
@@ -52,3 +52,6 @@ test_output*.txt
 typer_test_output*.txt
 test_cli_manual*.py
 test_typer_*.py
+
+.vercel
+.env*
