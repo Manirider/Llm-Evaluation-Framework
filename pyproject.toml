@@ -22,7 +22,7 @@ dependencies = [
     # Core
     "pydantic>=2.8,<3",
     "pydantic-settings>=2.3,<3",
-    "typer[all]>=0.12,<1",
+    "typer>=0.12,<1",
     "pyyaml>=6.0,<7",
     "python-dotenv>=1.0,<2",
     
@@ -143,7 +143,7 @@ all = [
     "llm-eval[viz,benchmarks,devops,dev,docs]",
 ]
 
-[project.entry-points."console_scripts"]
+[project.scripts]
 llm-eval = "llm_eval.cli.main:app"
 
 [project.urls]
@@ -253,6 +253,7 @@ ignore = [
     "B008",   # do not perform function calls in argument defaults
     "ARG001", # unused argument
     "ARG002", # unused argument
+    "UP017",  # datetime.UTC alias rule
 ]
 
 [tool.ruff.lint.per-file-ignores]
