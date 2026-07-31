@@ -55,20 +55,20 @@ jobs:
       - name: Run Pytest Suite with Coverage
         run: |
           poetry run pytest tests/ -v \
-            --cov=src/llm_eval \
+            --cov=llm_eval \
             --cov-report=xml:coverage.xml \
             --cov-report=term-missing \
-            --cov-fail-under=0 || true
+            --cov-fail-under=80
 
-      - name: Upload Coverage Report
+      - name: Dry-Run Evaluation Benchmark
+        run: |
+          poetry run llm-eval version
+          poetry run llm-eval metrics
+          poetry run llm-eval benchmark --output-dir results/ci_benchmark
+
+      - name: Upload Evaluation Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report-py${{ matrix.python-version }}
-          path: coverage.xml
-
-      - name: Dry-Run CLI Smoke Tests
-        run: |
-          poetry run llm-eval version || true
-          poetry run llm-eval doctor || true
-          poetry run llm-eval metrics || true
+          name: ci-evaluation-results-py${{ matrix.python-version }}
+          path: results/ci_benchmark/

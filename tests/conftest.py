@@ -23,6 +23,21 @@ from llm_eval.schemas.evaluation import EvaluationSample
 
 
 # ------------------------------------------------------------------
+# Auto-use fixture to ensure metric registration happens at test start
+# ------------------------------------------------------------------
+
+
+@pytest.fixture(autouse=True)
+def _register_metrics():
+    """Ensure all metrics are registered by importing the metrics modules."""
+    # Import classical metrics (triggers BLEU, ROUGE-L registration)
+    import llm_eval.metrics.classical  # noqa: F401
+    import llm_eval.metrics.judge_metric  # noqa: F401
+    # Note: semantic and rag metrics are lazy-loaded to avoid torch import
+    yield
+
+
+# ------------------------------------------------------------------
 # Evaluation samples
 # ------------------------------------------------------------------
 
@@ -135,17 +150,13 @@ def _fake_embed_single(text: str) -> np.ndarray:
     return _fake_embed_texts([text])[0]
 
 
-@pytest.fixture(autouse=True)
-def mock_embedding_service(request):
+@pytest.fixture()
+def mock_embedding_service():
     """
-    Auto-use fixture that patches the EmbeddingService singleton so no real
+    Fixture that patches the EmbeddingService singleton so no real
     SentenceTransformer model is downloaded during tests.
-    Skipped for dedicated EmbeddingService unit tests.
+    Use this fixture in tests that need embedding functionality.
     """
-    if request.module.__name__.endswith("test_embedding_service_unit"):
-        yield None
-        return
-
     mock_service = MagicMock()
     mock_service.embed_texts = MagicMock(side_effect=_fake_embed_texts)
     mock_service.embed_single = MagicMock(side_effect=_fake_embed_single)

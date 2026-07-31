@@ -4,11 +4,42 @@ Embedding service abstraction with caching, batching, and GPU support.
 
 from typing import Sequence
 import numpy as np
-from sentence_transformers import SentenceTransformer
 from loguru import logger
+
+try:
+    from sentence_transformers import SentenceTransformer
+except Exception:
+    SentenceTransformer = None
 
 from llm_eval.config.settings import EmbeddingConfig
 from llm_eval.exceptions.base import EmbeddingError
+
+
+class FallbackEmbeddingModel:
+    """Fallback embedding model using scikit-learn HashingVectorizer when PyTorch/SentenceTransformer is unavailable."""
+
+    def __init__(self, dim: int = 384) -> None:
+        self.dim = dim
+
+    def encode(self, texts: Sequence[str], **kwargs) -> np.ndarray:
+        if not texts:
+            return np.empty((0, self.dim), dtype=np.float32)
+        try:
+            from sklearn.feature_extraction.text import HashingVectorizer
+            vec = HashingVectorizer(n_features=self.dim, norm="l2", alternate_sign=False)
+            return vec.transform(texts).toarray().astype(np.float32)
+        except Exception:
+            # Basic character-code fallback if sklearn is missing
+            res = []
+            for t in texts:
+                arr = np.zeros(self.dim, dtype=np.float32)
+                for char_idx, ch in enumerate(t):
+                    arr[ord(ch) % self.dim] += 1.0
+                norm = np.linalg.norm(arr)
+                if norm > 0:
+                    arr /= norm
+                res.append(arr)
+            return np.array(res, dtype=np.float32)
 
 
 class EmbeddingService:
@@ -24,7 +55,12 @@ class EmbeddingService:
         self._cache: dict[str, np.ndarray] = {}
         try:
             logger.info(f"Loading SentenceTransformer model '{self.config.model_name}' on device '{self.config.device}'...")
+            if SentenceTransformer is None:
+                raise ImportError("sentence_transformers / torch is not available.")
             self.model = SentenceTransformer(self.config.model_name, device=self.config.device)
+        except (ImportError, OSError) as e:
+            logger.warning(f"SentenceTransformer/torch unavailable ({e}). Using HashingVectorizer fallback.")
+            self.model = FallbackEmbeddingModel()
         except Exception as e:
             raise EmbeddingError(f"Failed to load embedding model '{self.config.model_name}': {e}") from e
 

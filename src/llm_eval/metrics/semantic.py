@@ -3,10 +3,10 @@ Embedding Cosine Similarity and BERTScore semantic evaluation metrics.
 """
 
 from typing import Any
+
 import numpy as np
 
 from llm_eval.core.base_metric import BaseMetric, MetricRegistry
-from llm_eval.embeddings.service import EmbeddingService
 from llm_eval.schemas.evaluation import EvaluationSample
 
 
@@ -21,7 +21,14 @@ class EmbeddingSimilarityMetric(BaseMetric):
 
     def __init__(self, threshold: float | None = None, **kwargs: Any) -> None:
         super().__init__(threshold=threshold, **kwargs)
-        self.embedding_service = EmbeddingService.get_instance()
+        self._embedding_service = None
+
+    @property
+    def embedding_service(self):
+        if self._embedding_service is None:
+            from llm_eval.embeddings.service import EmbeddingService
+            self._embedding_service = EmbeddingService.get_instance()
+        return self._embedding_service
 
     def _compute(self, sample: EvaluationSample) -> tuple[float, str | None, dict[str, Any]]:
         if not sample.expected_output:
@@ -60,7 +67,14 @@ class BERTScoreMetric(BaseMetric):
 
     def __init__(self, threshold: float | None = None, **kwargs: Any) -> None:
         super().__init__(threshold=threshold, **kwargs)
-        self.embedding_service = EmbeddingService.get_instance()
+        self._embedding_service = None
+
+    @property
+    def embedding_service(self):
+        if self._embedding_service is None:
+            from llm_eval.embeddings.service import EmbeddingService
+            self._embedding_service = EmbeddingService.get_instance()
+        return self._embedding_service
 
     def _compute(self, sample: EvaluationSample) -> tuple[float, str | None, dict[str, Any]]:
         if not sample.expected_output:
@@ -78,7 +92,7 @@ class BERTScoreMetric(BaseMetric):
         # Compute cosine similarity matrix (len(c_tokens) x len(r_tokens))
         c_norms = np.linalg.norm(c_vecs, axis=1, keepdims=True)
         r_norms = np.linalg.norm(r_vecs, axis=1, keepdims=True)
-        
+
         # Avoid division by zero
         c_norms[c_norms == 0] = 1e-8
         r_norms[r_norms == 0] = 1e-8

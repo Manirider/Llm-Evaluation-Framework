@@ -84,10 +84,21 @@ class MetricRegistry:
         return decorator
 
     @classmethod
+    def _ensure_metrics_loaded(cls) -> None:
+        try:
+            import llm_eval.metrics.classical  # noqa: F401
+            import llm_eval.metrics.judge_metric  # noqa: F401
+            import llm_eval.metrics.semantic  # noqa: F401
+            import llm_eval.rag.metrics  # noqa: F401
+        except Exception:
+            pass
+
+    @classmethod
     def get(cls, name: str, threshold: float | None = None, **kwargs: Any) -> BaseMetric:
         """
         Instantiate a registered metric by name.
         """
+        cls._ensure_metrics_loaded()
         with cls._lock:
             if name not in cls._registry:
                 available = list(cls._registry.keys())
@@ -102,5 +113,6 @@ class MetricRegistry:
         """
         List all registered metric names.
         """
+        cls._ensure_metrics_loaded()
         with cls._lock:
             return list(cls._registry.keys())

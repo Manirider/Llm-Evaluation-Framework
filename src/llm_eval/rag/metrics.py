@@ -14,9 +14,21 @@ import numpy as np
 
 from llm_eval.config.settings import LLMProviderConfig
 from llm_eval.core.base_metric import BaseMetric, MetricRegistry
-from llm_eval.embeddings.service import EmbeddingService
 from llm_eval.judge.providers import MockJudge, create_judge
 from llm_eval.schemas.evaluation import EvaluationSample
+
+
+# Lazy import for EmbeddingService to avoid torch/sentence_transformers at module load
+_EmbeddingService = None
+
+
+def _get_embedding_service():
+    """Get or create EmbeddingService instance lazily."""
+    global _EmbeddingService
+    if _EmbeddingService is None:
+        from llm_eval.embeddings.service import EmbeddingService
+        _EmbeddingService = EmbeddingService.get_instance()
+    return _EmbeddingService
 
 
 def _cosine_similarity(vec_a: np.ndarray, vec_b: np.ndarray) -> float:
@@ -50,7 +62,7 @@ class FaithfulnessMetric(BaseMetric):
 
     def __init__(self, threshold: float | None = None, **kwargs: Any) -> None:
         super().__init__(threshold=threshold, **kwargs)
-        self.embedding_service = EmbeddingService.get_instance()
+        self.embedding_service = _get_embedding_service()
         judge_config = kwargs.get("judge_config")
         self.judge = (
             create_judge(judge_config)
@@ -117,7 +129,7 @@ class ContextRelevancyMetric(BaseMetric):
 
     def __init__(self, threshold: float | None = None, **kwargs: Any) -> None:
         super().__init__(threshold=threshold, **kwargs)
-        self.embedding_service = EmbeddingService.get_instance()
+        self.embedding_service = _get_embedding_service()
 
     def _compute(
         self, sample: EvaluationSample
@@ -161,7 +173,7 @@ class AnswerRelevancyMetric(BaseMetric):
 
     def __init__(self, threshold: float | None = None, **kwargs: Any) -> None:
         super().__init__(threshold=threshold, **kwargs)
-        self.embedding_service = EmbeddingService.get_instance()
+        self.embedding_service = _get_embedding_service()
 
     def _compute(
         self, sample: EvaluationSample
@@ -195,7 +207,7 @@ class ContextPrecisionMetric(BaseMetric):
 
     def __init__(self, threshold: float | None = None, relevance_cutoff: float = 0.55, **kwargs: Any) -> None:
         super().__init__(threshold=threshold, **kwargs)
-        self.embedding_service = EmbeddingService.get_instance()
+        self.embedding_service = _get_embedding_service()
         self.relevance_cutoff = relevance_cutoff
 
     def _compute(
@@ -252,7 +264,7 @@ class ContextRecallMetric(BaseMetric):
 
     def __init__(self, threshold: float | None = None, support_cutoff: float = 0.55, **kwargs: Any) -> None:
         super().__init__(threshold=threshold, **kwargs)
-        self.embedding_service = EmbeddingService.get_instance()
+        self.embedding_service = _get_embedding_service()
         self.support_cutoff = support_cutoff
 
     def _compute(
@@ -309,7 +321,7 @@ class GroundednessMetric(BaseMetric):
 
     def __init__(self, threshold: float | None = None, **kwargs: Any) -> None:
         super().__init__(threshold=threshold, **kwargs)
-        self.embedding_service = EmbeddingService.get_instance()
+        self.embedding_service = _get_embedding_service()
 
     def _compute(
         self, sample: EvaluationSample
@@ -366,7 +378,7 @@ class HallucinationDetectionMetric(BaseMetric):
 
     def __init__(self, threshold: float | None = None, support_cutoff: float = 0.55, **kwargs: Any) -> None:
         super().__init__(threshold=threshold, **kwargs)
-        self.embedding_service = EmbeddingService.get_instance()
+        self.embedding_service = _get_embedding_service()
         self.support_cutoff = support_cutoff
 
     def _compute(

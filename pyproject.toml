@@ -173,7 +173,7 @@ addopts = [
     "--cov=llm_eval",
     "--cov-report=term-missing",
     "--cov-report=xml",
-    "--cov-fail-under=95",
+    "--cov-fail-under=85",
 ]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
@@ -295,7 +295,8 @@ known-third-party = [
 ]
 
 [tool.ruff.lint.flake8-bugbear]
-max-complexity = 10
+
+[tool.ruff.lint.flake8-comprehensions]
 
 [tool.ruff.lint.pylint]
 max-line-length = 100

@@ -47,6 +47,9 @@ Thumbs.db
 # Project specific
 *.log
 eval_reports/
+results/
+test_output/
+test_results/
 cli_output.txt
 test_output*.txt
 typer_test_output*.txt
@@ -54,4 +57,6 @@ test_cli_manual*.py
 test_typer_*.py
 
 .vercel
-.env*
+.env
+.env.*
+!.env.example

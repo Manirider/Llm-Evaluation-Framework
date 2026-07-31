@@ -4,12 +4,16 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./data:/app/data
+      - ./benchmarks:/app/benchmarks
+      - ./config.example.yaml:/app/config.yaml
+      - ./results:/app/results
       - ./eval_reports:/app/eval_reports
     environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       - LLM_EVAL_PIPELINE__MAX_WORKERS=4
       - LLM_EVAL_LOG_LEVEL=INFO
-    command: ["benchmark", "--output-dir", "eval_reports/docker_benchmark"]
+    command: ["benchmark", "--output-dir", "results/docker_benchmark"]
     healthcheck:
       test: ["CMD", "python", "-c", "import llm_eval; print(llm_eval.__version__)"]
       interval: 30s

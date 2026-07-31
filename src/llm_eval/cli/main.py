@@ -12,8 +12,6 @@ Commands:
     doctor     — System diagnostic health check.
 """
 
-from __future__ import annotations
-
 import json
 import sys
 from pathlib import Path
@@ -35,6 +33,13 @@ from llm_eval.reporting.generator import ReportGenerator
 from llm_eval.schemas.evaluation import EvaluationRunReport
 from llm_eval.utils.logger import setup_logger
 from llm_eval.visualization.engine import VisualAnalyticsEngine
+
+# Trigger metric auto-registration by importing metrics modules
+try:
+    import llm_eval.metrics  # noqa: F401
+    import llm_eval.rag  # noqa: F401
+except Exception:
+    pass
 
 app = typer.Typer(
     name="llm-eval",
@@ -195,20 +200,12 @@ def validate_cmd(
 # ------------------------------------------------------------------
 
 
-@app.command("run")
-def run_evaluation_cmd(
-    dataset: Path = typer.Option(
-        ..., "--dataset", "-d", help="Path to evaluation dataset file (.jsonl or .csv)"
-    ),
-    config: Optional[Path] = typer.Option(
-        None, "--config", "-c", help="Path to YAML/JSON configuration file"
-    ),
-    output_dir: Path = typer.Option(
-        Path("eval_reports"), "--output-dir", "-o", help="Directory to save report artifacts"
-    ),
-    run_id: str = typer.Option("eval_run", "--run-id", help="Unique identifier for evaluation run"),
+def _run_evaluation(
+    dataset: Path,
+    config: Optional[Path],
+    output_dir: Path,
+    run_id: str,
 ) -> None:
-    """Execute complete LLM evaluation pipeline."""
     console.print(f"[bold green]Starting Evaluation Run:[/bold green] `{run_id}`")
 
     cfg = (
@@ -251,6 +248,23 @@ def run_evaluation_cmd(
         raise typer.Exit(code=1) from e
 
 
+@app.command("run")
+def run_evaluation_cmd(
+    dataset: Path = typer.Option(
+        ..., "--dataset", "-d", help="Path to evaluation dataset file (.jsonl or .csv)"
+    ),
+    config: Optional[Path] = typer.Option(
+        None, "--config", "-c", help="Path to YAML/JSON configuration file"
+    ),
+    output_dir: Path = typer.Option(
+        Path("eval_reports"), "--output-dir", "-o", help="Directory to save report artifacts"
+    ),
+    run_id: str = typer.Option("eval_run", "--run-id", help="Unique identifier for evaluation run"),
+) -> None:
+    """Execute complete LLM evaluation pipeline."""
+    _run_evaluation(dataset=dataset, config=config, output_dir=output_dir, run_id=run_id)
+
+
 # ------------------------------------------------------------------
 # benchmark
 # ------------------------------------------------------------------
@@ -268,7 +282,7 @@ def benchmark_cmd(
         console.print(f"[bold red]Benchmark dataset not found at {benchmark_path}[/bold red]")
         raise typer.Exit(code=1)
 
-    run_evaluation_cmd(
+    _run_evaluation(
         dataset=benchmark_path, config=None, output_dir=output_dir, run_id="benchmark_run"
     )
 
