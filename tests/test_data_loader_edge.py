@@ -28,9 +28,7 @@ class TestDataLoaderEdgeCases:
     def test_jsonl_blank_lines_skipped(self, tmp_path: Path) -> None:
         f = tmp_path / "data.jsonl"
         f.write_text(
-            "\n"
-            + json.dumps({"sample_id": "s1", "input_text": "Q", "actual_output": "A"})
-            + "\n\n"
+            "\n" + json.dumps({"sample_id": "s1", "input_text": "Q", "actual_output": "A"}) + "\n\n"
         )
         samples = DatasetLoader.load(f)
         assert len(samples) == 1
@@ -75,9 +73,9 @@ class TestDataLoaderEdgeCases:
 
     def test_csv_validation_error(self, tmp_path: Path) -> None:
         f = tmp_path / "invalid.csv"
-        pd.DataFrame(
-            {"sample_id": ["s1"], "input_text": ["  "], "actual_output": ["A"]}
-        ).to_csv(f, index=False)
+        pd.DataFrame({"sample_id": ["s1"], "input_text": ["  "], "actual_output": ["A"]}).to_csv(
+            f, index=False
+        )
         with pytest.raises(DatasetValidationError):
             DatasetLoader.load(f)
 

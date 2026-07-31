@@ -50,7 +50,9 @@ def _recover_malformed_json(raw_text: str) -> dict[str, Any]:
         return {
             "score": float(score_match.group(1)),
             "passed": passed_match.group(1).lower() == "true" if passed_match else True,
-            "reasoning": reasoning_match.group(1) if reasoning_match else "Recovered from malformed JSON.",
+            "reasoning": reasoning_match.group(1)
+            if reasoning_match
+            else "Recovered from malformed JSON.",
         }
 
     raise JudgeExecutionError(
@@ -85,7 +87,9 @@ class MockJudge(BaseLLMJudge):
         system_prompt: str | None = None,
     ) -> JudgeVerdict:
         prompt_lower = prompt.lower()
-        if any(kw in prompt_lower for kw in ("hallucination", "unsupported", "incorrect", "fabricat")):
+        if any(
+            kw in prompt_lower for kw in ("hallucination", "unsupported", "incorrect", "fabricat")
+        ):
             score = 0.2
             passed = False
             reasoning = "Mock judge detected potential hallucination or factual inconsistency."
@@ -114,10 +118,10 @@ class OpenAIJudge(BaseLLMJudge):
 
             api_key = self.config.get_api_key() or "mock-key"
             self.client = OpenAI(api_key=api_key, base_url=self.config.base_url)
-        except ImportError:
+        except ImportError as err:
             raise JudgeExecutionError(
                 "openai package is not installed. Install via `poetry add openai`."
-            )
+            ) from err
 
     @retry(
         stop=stop_after_attempt(3),
@@ -130,13 +134,10 @@ class OpenAIJudge(BaseLLMJudge):
         prompt: str,
         system_prompt: str | None = None,
     ) -> JudgeVerdict:
-        sys_instructions = (
-            system_prompt
-            or (
-                "You are an objective evaluation judge. Analyze the provided text against "
-                "criteria and return JSON matching: "
-                '{"score": float (0.0 to 1.0), "passed": bool, "reasoning": str}.'
-            )
+        sys_instructions = system_prompt or (
+            "You are an objective evaluation judge. Analyze the provided text against "
+            "criteria and return JSON matching: "
+            '{"score": float (0.0 to 1.0), "passed": bool, "reasoning": str}.'
         )
 
         try:
@@ -173,8 +174,8 @@ class AnthropicJudge(BaseLLMJudge):
 
             api_key = self.config.get_api_key() or "mock-key"
             self.client = Anthropic(api_key=api_key)
-        except ImportError:
-            raise JudgeExecutionError("anthropic package is not installed.")
+        except ImportError as err:
+            raise JudgeExecutionError("anthropic package is not installed.") from err
 
     @retry(
         stop=stop_after_attempt(3),
@@ -186,12 +187,9 @@ class AnthropicJudge(BaseLLMJudge):
         prompt: str,
         system_prompt: str | None = None,
     ) -> JudgeVerdict:
-        sys_instructions = (
-            system_prompt
-            or (
-                "You are an expert LLM evaluation judge. Return valid JSON only: "
-                '{"score": float (0-1), "passed": bool, "reasoning": str}.'
-            )
+        sys_instructions = system_prompt or (
+            "You are an expert LLM evaluation judge. Return valid JSON only: "
+            '{"score": float (0-1), "passed": bool, "reasoning": str}.'
         )
 
         try:

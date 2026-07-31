@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from pathlib import Path
 
 from llm_eval.reporting.generator import ReportGenerator
@@ -18,22 +17,45 @@ from llm_eval.schemas.evaluation import (
 def _make_report() -> EvaluationRunReport:
     """Build a minimal report for testing."""
     sample = EvaluationSample(
-        sample_id="s1", input_text="What is AI?", actual_output="AI is artificial intelligence.",
-        expected_output="Artificial intelligence.", retrieved_contexts=["AI field."],
+        sample_id="s1",
+        input_text="What is AI?",
+        actual_output="AI is artificial intelligence.",
+        expected_output="Artificial intelligence.",
+        retrieved_contexts=["AI field."],
     )
-    metric_result = MetricResult(metric_name="bleu", score=0.85, passed=True, reasoning="Good match")
+    metric_result = MetricResult(
+        metric_name="bleu", score=0.85, passed=True, reasoning="Good match"
+    )
     sample_result = SampleEvaluationResult(
-        sample_id="s1", sample=sample, metrics={"bleu": metric_result},
+        sample_id="s1",
+        sample=sample,
+        metrics={"bleu": metric_result},
     )
     stats = MetricStatistics(
-        metric_name="bleu", count=1, mean=0.85, std_dev=0.0, variance=0.0,
-        min=0.85, max=0.85, median=0.85, mode=0.85,
-        p10=0.85, p25=0.85, p75=0.85, p90=0.85,
-        skewness=0.0, kurtosis=0.0, ci_95_lower=0.85, ci_95_upper=0.85,
+        metric_name="bleu",
+        count=1,
+        mean=0.85,
+        std_dev=0.0,
+        variance=0.0,
+        min=0.85,
+        max=0.85,
+        median=0.85,
+        mode=0.85,
+        p10=0.85,
+        p25=0.85,
+        p75=0.85,
+        p90=0.85,
+        skewness=0.0,
+        kurtosis=0.0,
+        ci_95_lower=0.85,
+        ci_95_upper=0.85,
     )
     return EvaluationRunReport(
-        run_id="test_report", dataset_size=1, configured_metrics=["bleu"],
-        sample_results=[sample_result], metric_summary={"bleu": stats},
+        run_id="test_report",
+        dataset_size=1,
+        configured_metrics=["bleu"],
+        sample_results=[sample_result],
+        metric_summary={"bleu": stats},
         execution_duration_seconds=0.5,
     )
 
@@ -53,6 +75,7 @@ class TestReportGenerator:
 
     def test_json_valid(self, tmp_path: Path) -> None:
         import json
+
         gen = ReportGenerator(output_dir=tmp_path)
         report = _make_report()
         path = gen.to_json(report, tmp_path / "r.json")

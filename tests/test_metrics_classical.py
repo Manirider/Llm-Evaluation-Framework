@@ -22,7 +22,9 @@ class TestBLEUMetric:
 
     def test_bleu_identical(self) -> None:
         sample = EvaluationSample(
-            sample_id="id", input_text="Q", actual_output="exact match sentence here",
+            sample_id="id",
+            input_text="Q",
+            actual_output="exact match sentence here",
             expected_output="exact match sentence here",
         )
         metric = BLEUMetric()
@@ -61,7 +63,8 @@ class TestROUGEMetric:
 
     def test_rouge_identical(self) -> None:
         sample = EvaluationSample(
-            sample_id="id", input_text="Q",
+            sample_id="id",
+            input_text="Q",
             actual_output="identical text here",
             expected_output="identical text here",
         )

@@ -21,9 +21,7 @@ class EvaluationSample(BaseModel):
     sample_id: str = Field(..., description="Unique identifier for the evaluation sample")
     input_text: str = Field(..., description="Prompt or query input")
     actual_output: str = Field(..., description="Generated text response from the model under test")
-    expected_output: str | None = Field(
-        default=None, description="Ground truth target output"
-    )
+    expected_output: str | None = Field(default=None, description="Ground truth target output")
     retrieved_contexts: list[str] | None = Field(
         default=None, description="Context passages for RAG evaluation"
     )

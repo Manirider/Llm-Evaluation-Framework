@@ -46,7 +46,8 @@ class TestBERTScore:
 
     def test_identical_high_score(self) -> None:
         sample = EvaluationSample(
-            sample_id="id", input_text="Q",
+            sample_id="id",
+            input_text="Q",
             actual_output="word one two three",
             expected_output="word one two three",
         )

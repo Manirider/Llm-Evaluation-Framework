@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import numpy as np
 
-from llm_eval.schemas.evaluation import EvaluationSample
-
 
 class TestEmbeddingService:
     def test_embed_texts(self, mock_embedding_service) -> None:

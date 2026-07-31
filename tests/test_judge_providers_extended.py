@@ -40,7 +40,13 @@ class TestOpenAIJudge:
         mock_client = MagicMock()
         mock_openai_cls.return_value = mock_client
         mock_client.chat.completions.create.return_value = MagicMock(
-            choices=[MagicMock(message=MagicMock(content='{"score": 0.85, "passed": true, "reasoning": "Good"}'))]
+            choices=[
+                MagicMock(
+                    message=MagicMock(
+                        content='{"score": 0.85, "passed": true, "reasoning": "Good"}'
+                    )
+                )
+            ]
         )
 
         cfg = LLMProviderConfig(provider="openai", model_name="gpt-4o")

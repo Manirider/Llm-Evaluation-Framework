@@ -2,9 +2,9 @@
 Evaluation dataset loaders for CSV and JSONL formats with strict schema validation.
 """
 
-from pathlib import Path
-from typing import Sequence
 import json
+from pathlib import Path
+
 import pandas as pd
 from pydantic import ValidationError
 
@@ -78,9 +78,7 @@ class DatasetLoader:
         required_cols = {"input_text", "actual_output"}
         missing_cols = required_cols - set(df.columns)
         if missing_cols:
-            raise DatasetValidationError(
-                f"CSV dataset missing required column(s): {missing_cols}"
-            )
+            raise DatasetValidationError(f"CSV dataset missing required column(s): {missing_cols}")
 
         samples: list[EvaluationSample] = []
         errors: list[str] = []
@@ -89,7 +87,7 @@ class DatasetLoader:
             record = row.to_dict()
             if "sample_id" not in record or pd.isna(record["sample_id"]):
                 record["sample_id"] = f"sample_{row_idx + 1}"
-            
+
             # Clean string conversions
             for key in ["input_text", "actual_output", "expected_output"]:
                 if key in record and pd.isna(record[key]):

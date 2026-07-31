@@ -2,7 +2,8 @@
 Embedding service abstraction with caching, batching, and GPU support.
 """
 
-from typing import Sequence
+from collections.abc import Sequence
+
 import numpy as np
 from loguru import logger
 
@@ -26,6 +27,7 @@ class FallbackEmbeddingModel:
             return np.empty((0, self.dim), dtype=np.float32)
         try:
             from sklearn.feature_extraction.text import HashingVectorizer
+
             vec = HashingVectorizer(n_features=self.dim, norm="l2", alternate_sign=False)
             return vec.transform(texts).toarray().astype(np.float32)
         except Exception:
@@ -33,7 +35,7 @@ class FallbackEmbeddingModel:
             res = []
             for t in texts:
                 arr = np.zeros(self.dim, dtype=np.float32)
-                for char_idx, ch in enumerate(t):
+                for ch in t:
                     arr[ord(ch) % self.dim] += 1.0
                 norm = np.linalg.norm(arr)
                 if norm > 0:
@@ -54,15 +56,21 @@ class EmbeddingService:
         self.config = config or EmbeddingConfig()
         self._cache: dict[str, np.ndarray] = {}
         try:
-            logger.info(f"Loading SentenceTransformer model '{self.config.model_name}' on device '{self.config.device}'...")
+            logger.info(
+                f"Loading SentenceTransformer model '{self.config.model_name}' on device '{self.config.device}'..."
+            )
             if SentenceTransformer is None:
                 raise ImportError("sentence_transformers / torch is not available.")
             self.model = SentenceTransformer(self.config.model_name, device=self.config.device)
         except (ImportError, OSError) as e:
-            logger.warning(f"SentenceTransformer/torch unavailable ({e}). Using HashingVectorizer fallback.")
+            logger.warning(
+                f"SentenceTransformer/torch unavailable ({e}). Using HashingVectorizer fallback."
+            )
             self.model = FallbackEmbeddingModel()
         except Exception as e:
-            raise EmbeddingError(f"Failed to load embedding model '{self.config.model_name}': {e}") from e
+            raise EmbeddingError(
+                f"Failed to load embedding model '{self.config.model_name}': {e}"
+            ) from e
 
     @classmethod
     def get_instance(cls, config: EmbeddingConfig | None = None) -> "EmbeddingService":
@@ -98,7 +106,7 @@ class EmbeddingService:
                     normalize_embeddings=self.config.normalize_embeddings,
                     show_progress_bar=False,
                 )
-                for idx, text, vec in zip(uncached_indices, uncached_texts, encoded):
+                for idx, text, vec in zip(uncached_indices, uncached_texts, encoded, strict=False):
                     vec_arr = np.array(vec, dtype=np.float32)
                     self._cache[text] = vec_arr
                     embeddings[idx] = vec_arr

@@ -14,13 +14,11 @@ import numpy as np
 import pytest
 
 from llm_eval.config.settings import (
-    EmbeddingConfig,
     EvaluationFrameworkConfig,
     LLMProviderConfig,
     MetricConfig,
 )
 from llm_eval.schemas.evaluation import EvaluationSample
-
 
 # ------------------------------------------------------------------
 # Auto-use fixture to ensure metric registration happens at test start
@@ -33,6 +31,7 @@ def _register_metrics():
     # Import classical metrics (triggers BLEU, ROUGE-L registration)
     import llm_eval.metrics.classical  # noqa: F401
     import llm_eval.metrics.judge_metric  # noqa: F401
+
     # Note: semantic and rag metrics are lazy-loaded to avoid torch import
     yield
 

@@ -8,9 +8,7 @@ examples, and actionable recommendations.
 from __future__ import annotations
 
 import csv
-import json
 from pathlib import Path
-from typing import Any
 
 from jinja2 import Template
 from loguru import logger
@@ -18,7 +16,6 @@ from loguru import logger
 from llm_eval.exceptions.base import ReportingError
 from llm_eval.schemas.evaluation import (
     EvaluationRunReport,
-    MetricStatistics,
     SampleEvaluationResult,
 )
 
@@ -284,27 +281,29 @@ class ReportGenerator:
         ]
 
         # Metric ranking by mean score
-        ranked = sorted(
-            report.metric_summary.items(), key=lambda x: x[1].mean, reverse=True
+        ranked = sorted(report.metric_summary.items(), key=lambda x: x[1].mean, reverse=True)
+        lines.extend(
+            [
+                "## Metric Ranking (Best → Worst)",
+                "",
+                "| Rank | Metric | Mean | Tier |",
+                "| :--- | :--- | :--- | :--- |",
+            ]
         )
-        lines.extend([
-            "## Metric Ranking (Best → Worst)",
-            "",
-            "| Rank | Metric | Mean | Tier |",
-            "| :--- | :--- | :--- | :--- |",
-        ])
         for rank, (m_name, stats) in enumerate(ranked, 1):
             tier = _metric_quality_tier(stats.mean)
             lines.append(f"| {rank} | `{m_name}` | {stats.mean:.4f} | {tier} |")
 
         # Full statistics table
-        lines.extend([
-            "",
-            "## Detailed Metric Statistics",
-            "",
-            "| Metric | Mean | Median | Std Dev | Min | Max | P25 | P75 | 95% CI |",
-            "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
-        ])
+        lines.extend(
+            [
+                "",
+                "## Detailed Metric Statistics",
+                "",
+                "| Metric | Mean | Median | Std Dev | Min | Max | P25 | P75 | 95% CI |",
+                "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
+            ]
+        )
         for m_name, stats in report.metric_summary.items():
             lines.append(
                 f"| `{m_name}` | {stats.mean:.4f} | {stats.median:.4f} | "
@@ -315,13 +314,15 @@ class ReportGenerator:
 
         # Pass/Fail summary
         pass_fail = _compute_pass_fail(report)
-        lines.extend([
-            "",
-            "## Pass / Fail Analysis",
-            "",
-            "| Metric | Pass | Fail | Pass Rate |",
-            "| :--- | :--- | :--- | :--- |",
-        ])
+        lines.extend(
+            [
+                "",
+                "## Pass / Fail Analysis",
+                "",
+                "| Metric | Pass | Fail | Pass Rate |",
+                "| :--- | :--- | :--- | :--- |",
+            ]
+        )
         for m_name, c in pass_fail.items():
             total = c["pass"] + c["fail"]
             rate = (c["pass"] / total * 100) if total > 0 else 0
@@ -331,11 +332,13 @@ class ReportGenerator:
         if ranked:
             weakest_metric = ranked[-1][0]
             worst = _worst_n(report, weakest_metric, n=3)
-            lines.extend([
-                "",
-                f"## Failure Analysis — Worst Samples for `{weakest_metric}`",
-                "",
-            ])
+            lines.extend(
+                [
+                    "",
+                    f"## Failure Analysis — Worst Samples for `{weakest_metric}`",
+                    "",
+                ]
+            )
             for sample_res in worst:
                 m_res = sample_res.metrics.get(weakest_metric)
                 score_str = f"{m_res.score:.4f}" if m_res else "N/A"
@@ -349,11 +352,13 @@ class ReportGenerator:
             # Best examples for strongest metric
             strongest_metric = ranked[0][0]
             best = _best_n(report, strongest_metric, n=3)
-            lines.extend([
-                "",
-                f"## Best Samples for `{strongest_metric}`",
-                "",
-            ])
+            lines.extend(
+                [
+                    "",
+                    f"## Best Samples for `{strongest_metric}`",
+                    "",
+                ]
+            )
             for sample_res in best:
                 m_res = sample_res.metrics.get(strongest_metric)
                 score_str = f"{m_res.score:.4f}" if m_res else "N/A"
@@ -369,18 +374,19 @@ class ReportGenerator:
             lines.append(f"- {rec}")
 
         # Per-sample detail table
-        lines.extend([
-            "",
-            "## Per-Sample Results",
-            "",
-            "| Sample ID | Metric | Score | Passed | Reasoning |",
-            "| :--- | :--- | :--- | :--- | :--- |",
-        ])
+        lines.extend(
+            [
+                "",
+                "## Per-Sample Results",
+                "",
+                "| Sample ID | Metric | Score | Passed | Reasoning |",
+                "| :--- | :--- | :--- | :--- | :--- |",
+            ]
+        )
         for res in report.sample_results:
             for m_name, m_res in res.metrics.items():
                 passed_str = (
-                    "N/A" if m_res.passed is None
-                    else ("✅ Pass" if m_res.passed else "❌ Fail")
+                    "N/A" if m_res.passed is None else ("✅ Pass" if m_res.passed else "❌ Fail")
                 )
                 reasoning = (m_res.reasoning or "").replace("\n", " ")[:100]
                 lines.append(
@@ -420,20 +426,30 @@ class ReportGenerator:
     def to_csv(self, report: EvaluationRunReport, file_path: Path) -> Path:
         with file_path.open("w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
-            writer.writerow([
-                "sample_id", "input_text", "actual_output", "expected_output",
-                "metric_name", "score", "passed", "reasoning",
-            ])
+            writer.writerow(
+                [
+                    "sample_id",
+                    "input_text",
+                    "actual_output",
+                    "expected_output",
+                    "metric_name",
+                    "score",
+                    "passed",
+                    "reasoning",
+                ]
+            )
             for res in report.sample_results:
                 for m_name, m_res in res.metrics.items():
-                    writer.writerow([
-                        res.sample_id,
-                        res.sample.input_text,
-                        res.sample.actual_output,
-                        res.sample.expected_output or "",
-                        m_name,
-                        m_res.score,
-                        m_res.passed,
-                        m_res.reasoning or "",
-                    ])
+                    writer.writerow(
+                        [
+                            res.sample_id,
+                            res.sample.input_text,
+                            res.sample.actual_output,
+                            res.sample.expected_output or "",
+                            m_name,
+                            m_res.score,
+                            m_res.passed,
+                            m_res.reasoning or "",
+                        ]
+                    )
         return file_path

@@ -17,7 +17,6 @@ from llm_eval.core.base_metric import BaseMetric, MetricRegistry
 from llm_eval.judge.providers import MockJudge, create_judge
 from llm_eval.schemas.evaluation import EvaluationSample
 
-
 # Lazy import for EmbeddingService to avoid torch/sentence_transformers at module load
 _EmbeddingService = None
 
@@ -27,6 +26,7 @@ def _get_embedding_service():
     global _EmbeddingService
     if _EmbeddingService is None:
         from llm_eval.embeddings.service import EmbeddingService
+
         _EmbeddingService = EmbeddingService.get_instance()
     return _EmbeddingService
 
@@ -70,9 +70,7 @@ class FaithfulnessMetric(BaseMetric):
             else MockJudge()
         )
 
-    def _compute(
-        self, sample: EvaluationSample
-    ) -> tuple[float, str | None, dict[str, Any]]:
+    def _compute(self, sample: EvaluationSample) -> tuple[float, str | None, dict[str, Any]]:
         if not sample.retrieved_contexts:
             return (
                 1.0,
@@ -131,9 +129,7 @@ class ContextRelevancyMetric(BaseMetric):
         super().__init__(threshold=threshold, **kwargs)
         self.embedding_service = _get_embedding_service()
 
-    def _compute(
-        self, sample: EvaluationSample
-    ) -> tuple[float, str | None, dict[str, Any]]:
+    def _compute(self, sample: EvaluationSample) -> tuple[float, str | None, dict[str, Any]]:
         if not sample.retrieved_contexts:
             return 0.0, "No retrieved contexts available to evaluate relevancy.", {}
 
@@ -175,9 +171,7 @@ class AnswerRelevancyMetric(BaseMetric):
         super().__init__(threshold=threshold, **kwargs)
         self.embedding_service = _get_embedding_service()
 
-    def _compute(
-        self, sample: EvaluationSample
-    ) -> tuple[float, str | None, dict[str, Any]]:
+    def _compute(self, sample: EvaluationSample) -> tuple[float, str | None, dict[str, Any]]:
         query_vec = self.embedding_service.embed_single(sample.input_text)
         answer_vec = self.embedding_service.embed_single(sample.actual_output)
 
@@ -205,14 +199,14 @@ class ContextPrecisionMetric(BaseMetric):
     metric_name: str = "context_precision"
     description: str = "Position-weighted precision of retrieved contexts relative to the query"
 
-    def __init__(self, threshold: float | None = None, relevance_cutoff: float = 0.55, **kwargs: Any) -> None:
+    def __init__(
+        self, threshold: float | None = None, relevance_cutoff: float = 0.55, **kwargs: Any
+    ) -> None:
         super().__init__(threshold=threshold, **kwargs)
         self.embedding_service = _get_embedding_service()
         self.relevance_cutoff = relevance_cutoff
 
-    def _compute(
-        self, sample: EvaluationSample
-    ) -> tuple[float, str | None, dict[str, Any]]:
+    def _compute(self, sample: EvaluationSample) -> tuple[float, str | None, dict[str, Any]]:
         if not sample.retrieved_contexts:
             return 0.0, "No retrieved contexts to evaluate precision.", {}
 
@@ -262,14 +256,14 @@ class ContextRecallMetric(BaseMetric):
     metric_name: str = "context_recall"
     description: str = "Coverage of expected output claims by retrieved contexts"
 
-    def __init__(self, threshold: float | None = None, support_cutoff: float = 0.55, **kwargs: Any) -> None:
+    def __init__(
+        self, threshold: float | None = None, support_cutoff: float = 0.55, **kwargs: Any
+    ) -> None:
         super().__init__(threshold=threshold, **kwargs)
         self.embedding_service = _get_embedding_service()
         self.support_cutoff = support_cutoff
 
-    def _compute(
-        self, sample: EvaluationSample
-    ) -> tuple[float, str | None, dict[str, Any]]:
+    def _compute(self, sample: EvaluationSample) -> tuple[float, str | None, dict[str, Any]]:
         if not sample.expected_output or not sample.retrieved_contexts:
             return 0.0, "Missing expected_output or retrieved_contexts for recall.", {}
 
@@ -323,9 +317,7 @@ class GroundednessMetric(BaseMetric):
         super().__init__(threshold=threshold, **kwargs)
         self.embedding_service = _get_embedding_service()
 
-    def _compute(
-        self, sample: EvaluationSample
-    ) -> tuple[float, str | None, dict[str, Any]]:
+    def _compute(self, sample: EvaluationSample) -> tuple[float, str | None, dict[str, Any]]:
         if not sample.retrieved_contexts:
             return 1.0, "No contexts to ground against; trivially grounded.", {}
 
@@ -338,9 +330,7 @@ class GroundednessMetric(BaseMetric):
 
         claim_best_scores: list[float] = []
         for s_vec in sent_vecs:
-            best = max(
-                _normalize_sim(_cosine_similarity(s_vec, c_vec)) for c_vec in ctx_vecs
-            )
+            best = max(_normalize_sim(_cosine_similarity(s_vec, c_vec)) for c_vec in ctx_vecs)
             claim_best_scores.append(best)
 
         groundedness = float(np.mean(claim_best_scores))
@@ -376,14 +366,14 @@ class HallucinationDetectionMetric(BaseMetric):
     metric_name: str = "hallucination_score"
     description: str = "Inverse hallucination ratio (1.0 = no hallucination)"
 
-    def __init__(self, threshold: float | None = None, support_cutoff: float = 0.55, **kwargs: Any) -> None:
+    def __init__(
+        self, threshold: float | None = None, support_cutoff: float = 0.55, **kwargs: Any
+    ) -> None:
         super().__init__(threshold=threshold, **kwargs)
         self.embedding_service = _get_embedding_service()
         self.support_cutoff = support_cutoff
 
-    def _compute(
-        self, sample: EvaluationSample
-    ) -> tuple[float, str | None, dict[str, Any]]:
+    def _compute(self, sample: EvaluationSample) -> tuple[float, str | None, dict[str, Any]]:
         if not sample.retrieved_contexts:
             return 0.0, "No contexts; cannot verify output — assuming full hallucination.", {}
 
@@ -398,13 +388,17 @@ class HallucinationDetectionMetric(BaseMetric):
 
         unsupported = 0
         sentence_details: list[dict[str, Any]] = []
-        for sent, vec in zip(sentences, sent_vecs):
+        for sent, vec in zip(sentences, sent_vecs, strict=False):
             sim = _normalize_sim(_cosine_similarity(vec, ctx_vec))
             is_hallucinated = sim < self.support_cutoff
             if is_hallucinated:
                 unsupported += 1
             sentence_details.append(
-                {"sentence": sent[:80], "similarity": round(sim, 4), "hallucinated": is_hallucinated}
+                {
+                    "sentence": sent[:80],
+                    "similarity": round(sim, 4),
+                    "hallucinated": is_hallucinated,
+                }
             )
 
         hallucination_ratio = unsupported / len(sentences)

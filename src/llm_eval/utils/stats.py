@@ -4,7 +4,7 @@ Statistical computation routines for metric aggregates.
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
 
 import numpy as np
 import scipy.stats as sp_stats

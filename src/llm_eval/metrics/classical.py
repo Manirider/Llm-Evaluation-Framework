@@ -3,6 +3,7 @@ BLEU and ROUGE-L classical metric implementations.
 """
 
 from typing import Any
+
 import nltk
 from nltk.translate.bleu_score import SmoothingFunction, sentence_bleu
 from rouge_score import rouge_scorer
@@ -51,7 +52,9 @@ class BLEUMetric(BaseMetric):
             smoothing_function=self.smooth_fn,
         )
 
-        reasoning = f"BLEU-{self.n_grams} score computed across {len(candidate_tokens)} candidate tokens."
+        reasoning = (
+            f"BLEU-{self.n_grams} score computed across {len(candidate_tokens)} candidate tokens."
+        )
         details = {
             "n_grams": self.n_grams,
             "candidate_token_count": len(candidate_tokens),

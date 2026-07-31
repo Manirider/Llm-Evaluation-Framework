@@ -30,7 +30,9 @@ class TestEmbeddingServiceUnit:
 
     @patch("llm_eval.embeddings.service.SentenceTransformer")
     def test_embed_texts_caching(self, mock_st: MagicMock) -> None:
-        mock_st.return_value.encode.return_value = np.array([[1.0, 0.0], [0.0, 1.0]], dtype=np.float32)
+        mock_st.return_value.encode.return_value = np.array(
+            [[1.0, 0.0], [0.0, 1.0]], dtype=np.float32
+        )
         svc = EmbeddingService(EmbeddingConfig(model_name="test-model"))
 
         r1 = svc.embed_texts(["hello", "world"])

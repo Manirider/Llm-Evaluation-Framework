@@ -10,13 +10,19 @@ from llm_eval.metrics.judge_metric import LLMJudgeMetric
 BERTScoreMetric = None
 EmbeddingSimilarityMetric = None
 
+
 def _import_semantic():
     global BERTScoreMetric, EmbeddingSimilarityMetric
     if BERTScoreMetric is None:
-        from llm_eval.metrics.semantic import BERTScoreMetric as _BERTScoreMetric, EmbeddingSimilarityMetric as _EmbeddingSimilarityMetric
+        from llm_eval.metrics.semantic import BERTScoreMetric as _BERTScoreMetric
+        from llm_eval.metrics.semantic import (
+            EmbeddingSimilarityMetric as _EmbeddingSimilarityMetric,
+        )
+
         BERTScoreMetric = _BERTScoreMetric
         EmbeddingSimilarityMetric = _EmbeddingSimilarityMetric
     return BERTScoreMetric, EmbeddingSimilarityMetric
+
 
 __all__ = [
     "BLEUMetric",
@@ -25,6 +31,7 @@ __all__ = [
     "EmbeddingSimilarityMetric",
     "LLMJudgeMetric",
 ]
+
 
 def __getattr__(name: str):
     if name in ("BERTScoreMetric", "EmbeddingSimilarityMetric"):

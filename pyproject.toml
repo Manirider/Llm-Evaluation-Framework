@@ -222,42 +222,6 @@ output = "coverage.xml"
 target-version = "py311"
 line-length = 100
 indent-width = 4
-select = [
-    "E",   # pycodestyle errors
-    "W",   # pycodestyle warnings
-    "F",   # pyflakes
-    "I",   # isort
-    "N",   # pep8-naming
-    "UP",  # pyupgrade
-    "B",   # flake8-bugbear
-    "C4",  # flake8-comprehensions
-    "T20", # flake8-print
-    "SIM", # flake8-simplify
-    "RUF", # ruff-specific
-    "PD",  # pandas-vet
-    "TRY", # tryceratops
-    "ARG", # flake8-unused-arguments
-    "PTH", # flake8-use-pathlib
-    "ERA", # eradicate
-    "TID", # flake8-tidy-imports
-    "PL",  # pylint
-    "Q",   # flake8-quotes
-    "RET", # flake8-return
-    "FLY", # flynt
-    "PERF", # perflint
-]
-ignore = [
-    "E501",  # line too long (handled by line-length)
-    "B008",  # do not perform function calls in argument defaults
-    "C901",  # too complex (handled by complexity)
-    "T201",  # print statement (allowed in CLI)
-    "ARG001", # unused argument (allowed in callbacks)
-    "ARG002", # unused argument (allowed in callbacks)
-]
-per-file-ignores = [
-    { "tests/*" = ["S101", "S106", "T201"] },
-    { "src/llm_eval/cli/*" = ["T201"] },
-]
 exclude = [
     ".git",
     ".venv",
@@ -273,33 +237,38 @@ exclude = [
     "venv",
     ".venv",
 ]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",   # line too long (handled by line-length)
+    "B008",   # do not perform function calls in argument defaults
+    "ARG001", # unused argument
+    "ARG002", # unused argument
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S106", "T201"]
+"src/llm_eval/cli/*" = ["T201"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["llm_eval"]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "lf"
 
-[tool.ruff.lint.isort]
-known-first-party = ["llm_eval"]
-known-third-party = [
-    "pydantic", "pydantic_settings", "typer", "pyyaml", "python_dotenv",
-    "torch", "transformers", "sentence_transformers", "evaluate", "nltk",
-    "rouge_score", "bert_score", "sacrebleu", "openai", "anthropic",
-    "cohere", "google_generativeai", "tenacity", "pandas", "numpy",
-    "polars", "pyarrow", "matplotlib", "seaborn", "plotly", "kaleido",
-    "jinja2", "rich", "loguru", "diskcache", "joblib", "tqdm", "orjson",
-    "python_json_logger", "anyio", "trio", "email_validator", "prometheus_client",
-    "opentelemetry_api", "opentelemetry_sdk", "pydantic_settings", "python_dotenv",
-    "mkdocs", "mkdocs_material", "mkdocstrings", "mkdocs_autorefs",
-    "datasets", "huggingface_hub", "docker", "kubernetes",
-]
 
-[tool.ruff.lint.flake8-bugbear]
-
-[tool.ruff.lint.flake8-comprehensions]
-
-[tool.ruff.lint.pylint]
-max-line-length = 100
 
 [tool.mypy]
 python_version = "3.11"

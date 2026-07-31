@@ -27,12 +27,17 @@ class EmbeddingSimilarityMetric(BaseMetric):
     def embedding_service(self):
         if self._embedding_service is None:
             from llm_eval.embeddings.service import EmbeddingService
+
             self._embedding_service = EmbeddingService.get_instance()
         return self._embedding_service
 
     def _compute(self, sample: EvaluationSample) -> tuple[float, str | None, dict[str, Any]]:
         if not sample.expected_output:
-            return 0.0, "Skipped EmbeddingSimilarity calculation: sample missing expected_output", {}
+            return (
+                0.0,
+                "Skipped EmbeddingSimilarity calculation: sample missing expected_output",
+                {},
+            )
 
         vecs = self.embedding_service.embed_texts([sample.actual_output, sample.expected_output])
         actual_vec, expected_vec = vecs[0], vecs[1]
@@ -73,6 +78,7 @@ class BERTScoreMetric(BaseMetric):
     def embedding_service(self):
         if self._embedding_service is None:
             from llm_eval.embeddings.service import EmbeddingService
+
             self._embedding_service = EmbeddingService.get_instance()
         return self._embedding_service
 
@@ -112,7 +118,9 @@ class BERTScoreMetric(BaseMetric):
 
         # Clamp safely
         f1_clamped = max(0.0, min(1.0, f1))
-        reasoning = f"BERTScore F1: {f1_clamped:.4f} (Precision: {precision:.4f}, Recall: {recall:.4f})"
+        reasoning = (
+            f"BERTScore F1: {f1_clamped:.4f} (Precision: {precision:.4f}, Recall: {recall:.4f})"
+        )
         details = {
             "precision": round(precision, 4),
             "recall": round(recall, 4),

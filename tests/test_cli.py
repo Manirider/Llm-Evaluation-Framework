@@ -19,8 +19,13 @@ class TestCLI:
         # Skip on environments where torch/sentence_transformers fails to load
         # This is a known issue on some Windows environments with torch DLL loading
         result = runner.invoke(app, ["doctor"])
-        if result.exit_code != 0 and "DLL" in str(result.exception) or "1114" in str(result.exception):
+        if (
+            result.exit_code != 0
+            and "DLL" in str(result.exception)
+            or "1114" in str(result.exception)
+        ):
             import pytest
+
             pytest.skip(f"Skipping doctor test due to torch DLL issue: {result.exception}")
         assert result.exit_code == 0
         assert "Diagnostic" in result.output or "Health" in result.output
@@ -36,10 +41,11 @@ class TestCLI:
 
     def test_validate_valid_file(self, tmp_path) -> None:
         import json
+
         path = tmp_path / "test.jsonl"
-        path.write_text(json.dumps({
-            "sample_id": "s1", "input_text": "Q", "actual_output": "A"
-        }) + "\n")
+        path.write_text(
+            json.dumps({"sample_id": "s1", "input_text": "Q", "actual_output": "A"}) + "\n"
+        )
         result = runner.invoke(app, ["validate", str(path)])
         assert result.exit_code == 0, f"CLI output: {result.output}"
         assert "Success" in result.output

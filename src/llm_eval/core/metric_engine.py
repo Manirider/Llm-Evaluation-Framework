@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import hashlib
 import threading
+from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Sequence
 
 from loguru import logger
 

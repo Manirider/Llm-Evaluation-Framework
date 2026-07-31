@@ -5,13 +5,13 @@ from __future__ import annotations
 import pytest
 
 from llm_eval.config.settings import LLMProviderConfig
+from llm_eval.exceptions.base import JudgeExecutionError
 from llm_eval.judge.base import JudgeVerdict
 from llm_eval.judge.providers import (
     MockJudge,
     _recover_malformed_json,
     create_judge,
 )
-from llm_eval.exceptions.base import JudgeExecutionError
 
 
 class TestMockJudge:

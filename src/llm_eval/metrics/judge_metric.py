@@ -79,9 +79,7 @@ class LLMJudgeMetric(BaseMetric):
         )
         return "\n".join(parts)
 
-    def _compute(
-        self, sample: EvaluationSample
-    ) -> tuple[float, str | None, dict[str, Any]]:
+    def _compute(self, sample: EvaluationSample) -> tuple[float, str | None, dict[str, Any]]:
         prompt = self._build_prompt(sample)
         verdict = self.judge.evaluate_criterion(prompt)
 

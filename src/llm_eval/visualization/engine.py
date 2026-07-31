@@ -43,11 +43,13 @@ class VisualAnalyticsEngine:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         sns.set_theme(style="whitegrid", palette=self._PALETTE)
-        plt.rcParams.update({
-            "font.sans-serif": "DejaVu Sans",
-            "figure.dpi": self._DPI,
-            "savefig.bbox": "tight",
-        })
+        plt.rcParams.update(
+            {
+                "font.sans-serif": "DejaVu Sans",
+                "figure.dpi": self._DPI,
+                "savefig.bbox": "tight",
+            }
+        )
 
     # ------------------------------------------------------------------
     # Public API
@@ -65,13 +67,23 @@ class VisualAnalyticsEngine:
         try:
             visuals["radar"] = self.plot_radar_chart(report, self.output_dir / "radar_chart.png")
             visuals["boxplot"] = self.plot_score_boxplot(df, self.output_dir / "score_boxplot.png")
-            visuals["correlation"] = self.plot_correlation_heatmap(df, self.output_dir / "correlation_heatmap.png")
-            visuals["distributions"] = self.plot_metric_distributions(df, self.output_dir / "metric_distributions.png")
+            visuals["correlation"] = self.plot_correlation_heatmap(
+                df, self.output_dir / "correlation_heatmap.png"
+            )
+            visuals["distributions"] = self.plot_metric_distributions(
+                df, self.output_dir / "metric_distributions.png"
+            )
             visuals["histogram"] = self.plot_histogram(df, self.output_dir / "score_histogram.png")
             visuals["violin"] = self.plot_violin(df, self.output_dir / "score_violin.png")
-            visuals["heatmap"] = self.plot_sample_heatmap(df, self.output_dir / "sample_heatmap.png")
-            visuals["failure"] = self.plot_failure_breakdown(report, self.output_dir / "failure_breakdown.png")
-            visuals["comparison"] = self.plot_metric_comparison(report, self.output_dir / "metric_comparison.png")
+            visuals["heatmap"] = self.plot_sample_heatmap(
+                df, self.output_dir / "sample_heatmap.png"
+            )
+            visuals["failure"] = self.plot_failure_breakdown(
+                report, self.output_dir / "failure_breakdown.png"
+            )
+            visuals["comparison"] = self.plot_metric_comparison(
+                report, self.output_dir / "metric_comparison.png"
+            )
         except Exception as e:
             raise VisualizationError(f"Chart generation failed: {e}") from e
 
@@ -122,7 +134,9 @@ class VisualAnalyticsEngine:
         ax.set_ylim(0, 1.0)
         ax.set_title(
             f"Metric Performance Summary ({report.run_id})",
-            size=14, weight="bold", pad=20,
+            size=14,
+            weight="bold",
+            pad=20,
         )
 
         plt.tight_layout()
@@ -143,7 +157,12 @@ class VisualAnalyticsEngine:
         fig, ax = plt.subplots(figsize=(max(8, len(metric_cols) * 1.2), 6))
         sns.boxplot(data=df[metric_cols], ax=ax, palette=self._PALETTE, width=0.5)
         sns.stripplot(
-            data=df[metric_cols], ax=ax, color="black", alpha=0.3, jitter=0.2, size=4,
+            data=df[metric_cols],
+            ax=ax,
+            color="black",
+            alpha=0.3,
+            jitter=0.2,
+            size=4,
         )
         ax.set_title("Metric Score Distributions & Outliers", fontsize=14, fontweight="bold")
         ax.set_ylabel("Score (0.0 – 1.0)", fontsize=12)
@@ -168,8 +187,15 @@ class VisualAnalyticsEngine:
         fig, ax = plt.subplots(figsize=(max(7, len(metric_cols)), max(5, len(metric_cols) * 0.8)))
         corr = df[metric_cols].corr()
         sns.heatmap(
-            corr, annot=True, fmt=".2f", cmap="coolwarm",
-            vmin=-1.0, vmax=1.0, ax=ax, cbar=True, square=True,
+            corr,
+            annot=True,
+            fmt=".2f",
+            cmap="coolwarm",
+            vmin=-1.0,
+            vmax=1.0,
+            ax=ax,
+            cbar=True,
+            square=True,
             linewidths=0.5,
         )
         ax.set_title("Metric Score Correlation Matrix", fontsize=14, fontweight="bold")
@@ -252,8 +278,13 @@ class VisualAnalyticsEngine:
 
         fig, ax = plt.subplots(figsize=(max(8, len(metric_cols) * 1.2), 6))
         sns.violinplot(
-            data=melted, x="Metric", y="Score", ax=ax,
-            palette=self._PALETTE, inner="box", linewidth=1.2,
+            data=melted,
+            x="Metric",
+            y="Score",
+            ax=ax,
+            palette=self._PALETTE,
+            inner="box",
+            linewidth=1.2,
         )
         ax.set_title("Metric Score Violin Plots", fontsize=14, fontweight="bold")
         ax.set_ylabel("Score (0.0 – 1.0)", fontsize=12)
@@ -275,14 +306,22 @@ class VisualAnalyticsEngine:
         if not metric_cols:
             return file_path
 
-        heatmap_df = df.set_index("sample_id")[metric_cols] if "sample_id" in df.columns else df[metric_cols]
+        heatmap_df = (
+            df.set_index("sample_id")[metric_cols] if "sample_id" in df.columns else df[metric_cols]
+        )
 
         fig_height = max(4, len(heatmap_df) * 0.35)
         fig_width = max(6, len(metric_cols) * 1.2)
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
         sns.heatmap(
-            heatmap_df, annot=True, fmt=".2f", cmap="YlOrRd_r",
-            vmin=0.0, vmax=1.0, ax=ax, linewidths=0.3,
+            heatmap_df,
+            annot=True,
+            fmt=".2f",
+            cmap="YlOrRd_r",
+            vmin=0.0,
+            vmax=1.0,
+            ax=ax,
+            linewidths=0.3,
             cbar_kws={"label": "Score"},
         )
         ax.set_title("Sample × Metric Score Heatmap", fontsize=14, fontweight="bold")

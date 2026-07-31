@@ -10,19 +10,37 @@ ContextRecallMetric = None
 GroundednessMetric = None
 HallucinationDetectionMetric = None
 
+
 def _import_rag_metrics():
     global FaithfulnessMetric, ContextRelevancyMetric, AnswerRelevancyMetric
-    global ContextPrecisionMetric, ContextRecallMetric, GroundednessMetric, HallucinationDetectionMetric
+    global \
+        ContextPrecisionMetric, \
+        ContextRecallMetric, \
+        GroundednessMetric, \
+        HallucinationDetectionMetric
     if FaithfulnessMetric is None:
         from llm_eval.rag.metrics import (
-            FaithfulnessMetric as _FaithfulnessMetric,
-            ContextRelevancyMetric as _ContextRelevancyMetric,
             AnswerRelevancyMetric as _AnswerRelevancyMetric,
+        )
+        from llm_eval.rag.metrics import (
             ContextPrecisionMetric as _ContextPrecisionMetric,
+        )
+        from llm_eval.rag.metrics import (
             ContextRecallMetric as _ContextRecallMetric,
+        )
+        from llm_eval.rag.metrics import (
+            ContextRelevancyMetric as _ContextRelevancyMetric,
+        )
+        from llm_eval.rag.metrics import (
+            FaithfulnessMetric as _FaithfulnessMetric,
+        )
+        from llm_eval.rag.metrics import (
             GroundednessMetric as _GroundednessMetric,
+        )
+        from llm_eval.rag.metrics import (
             HallucinationDetectionMetric as _HallucinationDetectionMetric,
         )
+
         FaithfulnessMetric = _FaithfulnessMetric
         ContextRelevancyMetric = _ContextRelevancyMetric
         AnswerRelevancyMetric = _AnswerRelevancyMetric
@@ -30,6 +48,7 @@ def _import_rag_metrics():
         ContextRecallMetric = _ContextRecallMetric
         GroundednessMetric = _GroundednessMetric
         HallucinationDetectionMetric = _HallucinationDetectionMetric
+
 
 __all__ = [
     "FaithfulnessMetric",
@@ -40,6 +59,7 @@ __all__ = [
     "GroundednessMetric",
     "HallucinationDetectionMetric",
 ]
+
 
 def __getattr__(name: str):
     if name in __all__:

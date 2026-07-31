@@ -72,7 +72,9 @@ class TestCLIIntegration:
     def test_run_command_success(self) -> None:
         dataset = _temp_path_no_space("data.jsonl")
         dataset.write_text(
-            json.dumps({"sample_id": "s1", "input_text": "Q", "actual_output": "A", "expected_output": "A"})
+            json.dumps(
+                {"sample_id": "s1", "input_text": "Q", "actual_output": "A", "expected_output": "A"}
+            )
             + "\n"
         )
         output_dir = _temp_path_no_space("reports")
@@ -162,7 +164,9 @@ class TestCLIIntegration:
     def test_run_with_config_file(self) -> None:
         dataset = _temp_path_no_space("data.jsonl")
         dataset.write_text(
-            json.dumps({"sample_id": "s1", "input_text": "Q", "actual_output": "A", "expected_output": "A"})
+            json.dumps(
+                {"sample_id": "s1", "input_text": "Q", "actual_output": "A", "expected_output": "A"}
+            )
             + "\n"
         )
         config = _temp_path_no_space("config.yaml")

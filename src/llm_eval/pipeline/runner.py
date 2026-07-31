@@ -2,10 +2,10 @@
 Asynchronous evaluation pipeline with concurrent worker execution and error isolation.
 """
 
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
 import time
-from typing import Sequence
+from collections.abc import Sequence
+from concurrent.futures import ThreadPoolExecutor
+
 from loguru import logger
 
 from llm_eval.config.settings import EvaluationFrameworkConfig
@@ -80,12 +80,16 @@ class EvaluationPipeline:
             errors=errors,
         )
 
-    def run_batch(self, samples: Sequence[EvaluationSample], run_id: str = "run_default") -> EvaluationRunReport:
+    def run_batch(
+        self, samples: Sequence[EvaluationSample], run_id: str = "run_default"
+    ) -> EvaluationRunReport:
         """
         Execute evaluation pipeline over a collection of samples using a ThreadPoolExecutor.
         """
         start_time = time.perf_counter()
-        logger.info(f"Starting evaluation pipeline run '{run_id}' with {len(samples)} samples and {len(self.metrics)} metrics...")
+        logger.info(
+            f"Starting evaluation pipeline run '{run_id}' with {len(samples)} samples and {len(self.metrics)} metrics..."
+        )
 
         max_workers = min(self.config.pipeline.max_workers, max(1, len(samples)))
         results: list[SampleEvaluationResult] = []

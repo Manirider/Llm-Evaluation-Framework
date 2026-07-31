@@ -2,10 +2,11 @@
 Abstract Base Classes for metrics and metric registry pattern.
 """
 
-from abc import ABC, abstractmethod
 import threading
 import time
+from abc import ABC, abstractmethod
 from typing import Any, ClassVar
+
 from loguru import logger
 
 from llm_eval.exceptions.base import MetricExecutionError
@@ -75,6 +76,7 @@ class MetricRegistry:
         """
         Decorator to register a BaseMetric class.
         """
+
         def decorator(subclass: type[BaseMetric]) -> type[BaseMetric]:
             subclass.metric_name = name
             with cls._lock:

@@ -15,7 +15,6 @@ Commands:
 import json
 import sys
 from pathlib import Path
-from typing import Optional
 
 import typer
 from loguru import logger
@@ -58,7 +57,7 @@ console = Console()
 @app.callback()
 def main(
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable verbose debug logging"),
-    log_file: Optional[Path] = typer.Option(
+    log_file: Path | None = typer.Option(
         None, "--log-file", help="Path to write structured log file"
     ),
 ) -> None:
@@ -178,9 +177,7 @@ def list_metrics_cmd() -> None:
 
 @app.command("validate")
 def validate_cmd(
-    dataset: Path = typer.Argument(
-        ..., help="Path to .jsonl or .csv dataset file"
-    ),
+    dataset: Path = typer.Argument(..., help="Path to .jsonl or .csv dataset file"),
 ) -> None:
     """Validate dataset structure and schema compliance."""
     console.print(f"Validating dataset file: [yellow]{dataset}[/yellow]…")
@@ -202,7 +199,7 @@ def validate_cmd(
 
 def _run_evaluation(
     dataset: Path,
-    config: Optional[Path],
+    config: Path | None,
     output_dir: Path,
     run_id: str,
 ) -> None:
@@ -240,7 +237,7 @@ def _run_evaluation(
 
             progress.update(task, description="Done ✓")
 
-        console.print(f"\n[bold green]Evaluation Completed Successfully![/bold green]")
+        console.print("\n[bold green]Evaluation Completed Successfully![/bold green]")
         console.print(f"Report artifacts saved to: [cyan]{output_dir.resolve()}[/cyan]")
     except Exception as e:
         console.print(f"[bold red]Evaluation Pipeline Failure:[/bold red] {e}")
@@ -253,7 +250,7 @@ def run_evaluation_cmd(
     dataset: Path = typer.Option(
         ..., "--dataset", "-d", help="Path to evaluation dataset file (.jsonl or .csv)"
     ),
-    config: Optional[Path] = typer.Option(
+    config: Path | None = typer.Option(
         None, "--config", "-c", help="Path to YAML/JSON configuration file"
     ),
     output_dir: Path = typer.Option(
@@ -311,7 +308,7 @@ def report_cmd(
         report = EvaluationRunReport(**raw)
         gen = ReportGenerator(output_dir=output_dir)
         generated = gen.generate_all(report)
-        console.print(f"[bold green]Reports generated:[/bold green]")
+        console.print("[bold green]Reports generated:[/bold green]")
         for fmt, path in generated.items():
             console.print(f"  {fmt}: [cyan]{path}[/cyan]")
     except Exception as e:
@@ -343,7 +340,7 @@ def visualize_cmd(
         report = EvaluationRunReport(**raw)
         engine = VisualAnalyticsEngine(output_dir=output_dir)
         visuals = engine.generate_all_visuals(report)
-        console.print(f"[bold green]Visualizations generated:[/bold green]")
+        console.print("[bold green]Visualizations generated:[/bold green]")
         for name, path in visuals.items():
             console.print(f"  {name}: [cyan]{path}[/cyan]")
     except Exception as e:

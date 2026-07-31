@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import time
-from unittest.mock import MagicMock
 
 import pytest
 
 from llm_eval.core.base_metric import BaseMetric, MetricRegistry
 from llm_eval.core.metric_engine import MetricEngine
 from llm_eval.exceptions.base import MetricExecutionError
-from llm_eval.schemas.evaluation import EvaluationSample, MetricResult
+from llm_eval.schemas.evaluation import EvaluationSample
 
 
 class _SlowMetric(BaseMetric):
@@ -32,7 +31,9 @@ class _FailingMetric(BaseMetric):
 
 @pytest.fixture()
 def sample() -> EvaluationSample:
-    return EvaluationSample(sample_id="eng_1", input_text="Q", actual_output="A", expected_output="A")
+    return EvaluationSample(
+        sample_id="eng_1", input_text="Q", actual_output="A", expected_output="A"
+    )
 
 
 class TestMetricEngine:

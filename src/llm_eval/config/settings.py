@@ -125,6 +125,4 @@ class EvaluationFrameworkConfig(BaseSettings):
         except Exception as e:
             if isinstance(e, ConfigurationError):
                 raise e
-            raise ConfigurationError(
-                f"Failed to parse configuration file '{path}': {e}"
-            ) from e
+            raise ConfigurationError(f"Failed to parse configuration file '{path}': {e}") from e
